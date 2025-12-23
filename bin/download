@@ -33,9 +33,14 @@ mkdir -p "$ASDF_DOWNLOAD_PATH"
 release_file="${TOOL_NAME}_${sys_target}_${arch}"
 
 # Download file to the download directory
-if [[ ! -e "${ASDF_DOWNLOAD_PATH}/$release_file" ]]; then
-    download_release "$ASDF_INSTALL_VERSION" "$release_file"
-fi
+url="$GH_REPO/releases/download/v${ASDF_INSTALL_VERSION}/${release_file}"
 
+echo "* Downloading $TOOL_NAME release $ASDF_INSTALL_VERSION..."
+curl "${curl_opts[@]}" -o "${ASDF_DOWNLOAD_PATH}/$release_file" -C - "$url" || fail "Could not download $url"
+
+# TODO download sha256 and verify
+# sha256sum -c "${ASDF_DOWNLOAD_PATH}/${release_file}.sha256" || fail "sha256sum check failed"
+
+echo "* Making executable"
 chmod +x "${ASDF_DOWNLOAD_PATH}/$release_file"
 mv "${ASDF_DOWNLOAD_PATH}/$release_file" "${ASDF_DOWNLOAD_PATH}/opa"
